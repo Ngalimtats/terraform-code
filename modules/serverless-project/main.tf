@@ -1,28 +1,6 @@
-
-provider "aws" {
-  region = "us-east-1" 
-  profile = "default"
-}
-
-# Create an AWS Lambda function
-resource "aws_lambda_function" "example_lambda" {
-  function_name = "example_lambda_function"
-  handler      = "index.handler"
-  runtime      = "nodejs14.x"
-  role         = aws_iam_role.lambda_role.arn
-  filename     = "path/to/your/lambda_function.zip" # Replace with your deployment package
-
-  environment {
-    variables = {
-      ENV_VAR_KEY = "ENV_VAR_VALUE"
-    }
-  }
-}
-
-# Create an IAM role for the Lambda function
+# module to deploy lambda and api gateway and dynamoDB
 resource "aws_iam_role" "lambda_role" {
   name = "example_lambda_role"
-
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -40,15 +18,37 @@ resource "aws_iam_role" "lambda_role" {
 EOF
 }
 
-# Attach an IAM policy to the Lambda role for basic Lambda permissions
 resource "aws_iam_policy_attachment" "lambda_basic_execution" {
+  name = "lambda-execution-role"
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-  role       = aws_iam_role.lambda_role.name
 }
 
+resource "aws_lambda_function" "example_lambda" {
+  function_name = "example_lambda_function"
+  handler      = "tats.lambda_handler"
+  runtime      = "nodejs14.x"
+  role         = aws_iam_role.lambda_role.arn
+  filename     = "path/to/your/lambda_function.zip" # Replace with your deployment package
+
+  environment {
+    variables = {
+      ENV_VAR_KEY = "ENV_VAR_VALUE"
+    }
+  }
+}
+
+# Archive a single file.Always have to archive program code to use in lambda
+data "archive_file" "init" {
+  type        = "zip"
+  source_file = "${path.module}/serverless-project"
+  output_path = "${path.module}/serverless-project/tats.zip"
+}
+
+
+
 # Create an API Gateway to trigger the Lambda function
-resource "aws_api_gateway_rest_api" "example_api" {
-  name        = "example_api"
+resource "aws_api_gateway_rest_api" "this" {
+  name        = "${var.project_name}-api"
   description = "Example API"
 }
 

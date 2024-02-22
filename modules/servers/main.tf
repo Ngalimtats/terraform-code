@@ -21,10 +21,10 @@ resource "aws_instance" "server" {
   ami               = data.aws_ami.amazon_linux.id
   instance_type     = var.instance_type
   subnet_id         = var.private_subnets[0]
-  availability_zone = var.azs[0]
+  availability_zone = var.aws_availability_zones[0]
   vpc_security_group_ids   =[aws_security_group.server_sg.id]
   iam_instance_profile = aws_iam_instance_profile.this.name
-
+  #user_data = "${file("user-data.sh")}"
   user_data = <<-EOF
     #!/bin/bash
 

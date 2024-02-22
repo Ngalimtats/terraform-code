@@ -5,7 +5,7 @@ variable "instance_type" {
 variable "vpcid" {
     description = "ID of the VPC"
 }
-variable "azs" {
+variable "aws_availability_zones" {
     type = list(string)
     description = "availability zones hosting the subnets"
 }
