@@ -19,7 +19,7 @@ def lambda_handler(event, context):
     dynamodb_item = {
         'ID': unique_id,  # Replace with a unique identifier for each item 
         'DateTime': current_datetime, 
-        'message': 'Item written to DynamoDB with ID {} and DateTime {}'.format(unique_id, current_datetime)
+        'message': 'Your current datetime with ID {} is DateTime {}'.format(unique_id, current_datetime)
     }
 
     # Write the item to DynamoDB
@@ -29,7 +29,7 @@ def lambda_handler(event, context):
     response = {
         'statusCode': 200,
         'body': json.dumps({
-            'message': 'Item written to DynamoDB with ID {} and DateTime {}'.format(unique_id, current_datetime)
+            'message': 'Your current datetime with ID {} is DateTime {}'.format(unique_id,current_datetime)
         })
     }
 

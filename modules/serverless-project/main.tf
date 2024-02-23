@@ -68,6 +68,7 @@ resource "aws_lambda_function" "this" {
   role         = aws_iam_role.this.arn
   filename     = "${path.module}/tats.zip" # Replace with your deployment package
 
+  source_code_hash = filebase64(data.archive_file.init.output_path)
   environment {
     variables = {
       project_name = var.project_name
@@ -154,7 +155,18 @@ resource "aws_dynamodb_table" "this" {
 
   attribute {
     name = "ID"
-    type = "N"
+    type = "S"
+  }
+  attribute {
+    name = "DateTime"
+    type = "S"
+  }
+  global_secondary_index {
+    name               = "DateTimeIndex"
+    hash_key           = "DateTime"
+    projection_type    = "ALL"
+    read_capacity      = 1
+    write_capacity     = 1
   }
 }
 
