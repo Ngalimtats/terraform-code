@@ -3,7 +3,7 @@ variable "vpc_cidr" {
     type = string
     description = "CIDR block of VPC"
 }
-variable "azs" {
+variable "aws_availability_zones" {
     type = list(string)
     description = "availability zones hosting the subnets"
 }

@@ -18,6 +18,7 @@ data "aws_ami" "amazon_linux" {
 
 
 resource "aws_instance" "server" {
+  count = 2
   ami               = data.aws_ami.amazon_linux.id
   instance_type     = var.instance_type
   subnet_id         = var.private_subnets[0]
@@ -32,6 +33,7 @@ resource "aws_instance" "server" {
     sudo yum install -y nginx
     sudo systemctl start nginx
     sudo systemctl enable nginx
+    sudo echo "Hello Janes" > usr/share/nginx/html/index.html
   EOF
 
 
@@ -139,8 +141,9 @@ resource "aws_lb_target_group" "this" {
 
 
 resource "aws_lb_target_group_attachment" "this" {
+  count = 2
   target_group_arn = aws_lb_target_group.this.arn
-  target_id        = aws_instance.server.id
+  target_id        = aws_instance.server[count.index].id
   port             = 80
 }
 
