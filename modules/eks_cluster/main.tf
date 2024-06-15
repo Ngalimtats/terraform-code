@@ -23,6 +23,17 @@ data "aws_subnets" "default" {
   }
 }
 
+
+# Filter subnets to include only those in supported availability zones
+locals {
+  supported_azs = ["us-east-1a", "us-east-1b", "us-east-1c", "us-east-1d", "us-east-1f"]
+
+  supported_subnets = [
+    for subnet in data.aws_subnets.default.ids : subnet
+    if contains(local.supported_azs, element(split("-", subnet), 2))
+  ]
+}
+
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
   version = "18.26.6"
@@ -30,9 +41,10 @@ module "eks" {
   cluster_name    = var.cluster_name
   cluster_version = "1.24"
 
-  vpc_id     = data.aws_vpc.default.id
-  subnet_ids = data.aws_subnets.default.ids
+  vpc_id     = var.vpc_id
+  subnet_ids = local.supported_subnets
 
+  control_plane_subnet_ids = local.supported_subnets
 
   eks_managed_node_groups = {
     example = {
